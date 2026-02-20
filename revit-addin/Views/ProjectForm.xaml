@@ -1,0 +1,177 @@
+<UserControl x:Class="BuildScope.Views.ProjectForm"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="#1B1B1F">
+
+    <UserControl.Resources>
+        <Style x:Key="FormLabel" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#8E8E96" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontFamily" Value="Segoe UI" />
+            <Setter Property="Margin" Value="0,0,0,5" />
+        </Style>
+        <Style x:Key="FormInput" TargetType="TextBox">
+            <Setter Property="Background" Value="#2A2A30" />
+            <Setter Property="Foreground" Value="#EAEAEC" />
+            <Setter Property="CaretBrush" Value="#D4944C" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontFamily" Value="Segoe UI" />
+            <Setter Property="Padding" Value="10,8" />
+            <Setter Property="BorderBrush" Value="#3A3A42" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+        <Style x:Key="FormCombo" TargetType="ComboBox">
+            <Setter Property="Background" Value="#2A2A30" />
+            <Setter Property="Foreground" Value="#EAEAEC" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontFamily" Value="Segoe UI" />
+            <Setter Property="Padding" Value="10,8" />
+            <Setter Property="BorderBrush" Value="#3A3A42" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Grid.Row="0" Padding="14,9" Background="#232328"
+                BorderBrush="#3A3A42" BorderThickness="0,0,0,1">
+            <DockPanel>
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Center">
+                    <Border Width="22" Height="22" CornerRadius="5" Margin="0,0,9,0" VerticalAlignment="Center">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Color="#D4944C" Offset="0" />
+                                <GradientStop Color="#A06B30" Offset="1" />
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <TextBlock Text="B" Foreground="#FFFDF8" FontSize="11" FontWeight="Bold"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="Segoe UI" />
+                    </Border>
+                    <TextBlock Text="Build" Foreground="#EAEAEC" FontSize="14.5" FontWeight="Bold"
+                               VerticalAlignment="Center" FontFamily="Segoe UI" />
+                    <TextBlock Text="Scope" Foreground="#D4944C" FontSize="14.5"
+                               VerticalAlignment="Center" FontFamily="Segoe UI" />
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <!-- Form -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="20,16">
+            <StackPanel MaxWidth="320">
+                <TextBlock Text="New Project" Foreground="#EAEAEC" FontSize="16" FontWeight="Bold"
+                           FontFamily="Segoe UI" Margin="0,0,0,20" />
+
+                <TextBlock Text="Project Name" Style="{StaticResource FormLabel}" />
+                <TextBox x:Name="NameInput" Style="{StaticResource FormInput}" Margin="0,0,0,16" />
+
+                <TextBlock Text="Building Class" Style="{StaticResource FormLabel}" />
+                <ComboBox x:Name="ClassDropdown" Style="{StaticResource FormCombo}" Margin="0,0,0,16">
+                    <ComboBoxItem Content="1" />
+                    <ComboBoxItem Content="1a" />
+                    <ComboBoxItem Content="2" />
+                    <ComboBoxItem Content="3" />
+                    <ComboBoxItem Content="4" />
+                    <ComboBoxItem Content="5" />
+                    <ComboBoxItem Content="6" />
+                    <ComboBoxItem Content="7a" />
+                    <ComboBoxItem Content="7b" />
+                    <ComboBoxItem Content="8" />
+                    <ComboBoxItem Content="9a" />
+                    <ComboBoxItem Content="9b" />
+                    <ComboBoxItem Content="9c" />
+                    <ComboBoxItem Content="10a" />
+                    <ComboBoxItem Content="10b" />
+                    <ComboBoxItem Content="10c" />
+                </ComboBox>
+
+                <TextBlock Text="State / Territory" Style="{StaticResource FormLabel}" />
+                <ComboBox x:Name="StateDropdown" Style="{StaticResource FormCombo}" Margin="0,0,0,16">
+                    <ComboBoxItem Content="NSW" />
+                    <ComboBoxItem Content="VIC" />
+                    <ComboBoxItem Content="QLD" />
+                    <ComboBoxItem Content="SA" />
+                    <ComboBoxItem Content="WA" />
+                    <ComboBoxItem Content="TAS" />
+                    <ComboBoxItem Content="NT" />
+                    <ComboBoxItem Content="ACT" />
+                </ComboBox>
+
+                <TextBlock Text="Type of Construction" Style="{StaticResource FormLabel}" />
+                <ComboBox x:Name="TypeDropdown" Style="{StaticResource FormCombo}" Margin="0,0,0,24">
+                    <ComboBoxItem Content="Type A" />
+                    <ComboBoxItem Content="Type B" />
+                    <ComboBoxItem Content="Type C" />
+                </ComboBox>
+
+                <!-- Error message -->
+                <TextBlock x:Name="ErrorText" Foreground="#C75450" FontSize="12"
+                           FontFamily="Segoe UI" Margin="0,0,0,12" Visibility="Collapsed" />
+
+                <!-- Buttons -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="Cancel" Click="Cancel_Click"
+                            Background="#2A2A30" Foreground="#8E8E96"
+                            Padding="16,8" Margin="0,0,8,0" FontSize="13" FontFamily="Segoe UI"
+                            Cursor="Hand" BorderThickness="1" BorderBrush="#3A3A42">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="{TemplateBinding Background}"
+                                                    CornerRadius="6" Padding="{TemplateBinding Padding}"
+                                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                                    BorderThickness="{TemplateBinding BorderThickness}">
+                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                    <Button Content="Create Project" Click="Create_Click"
+                            Foreground="#FFFDF8" Padding="16,8" FontSize="13"
+                            FontWeight="SemiBold" FontFamily="Segoe UI" Cursor="Hand" BorderThickness="0">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border x:Name="Bd" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                                                <Border.Background>
+                                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                                        <GradientStop Color="#D4944C" Offset="0" />
+                                                        <GradientStop Color="#B87A38" Offset="1" />
+                                                    </LinearGradientBrush>
+                                                </Border.Background>
+                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="Bd" Property="Background">
+                                                        <Setter.Value>
+                                                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                                                <GradientStop Color="#E0A86A" Offset="0" />
+                                                                <GradientStop Color="#D4944C" Offset="1" />
+                                                            </LinearGradientBrush>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

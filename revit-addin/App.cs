@@ -1,6 +1,7 @@
 using Autodesk.Revit.UI;
 using Autodesk.Revit.Attributes;
 using System.Reflection;
+using BuildScope.Views;
 
 namespace BuildScope
 {
@@ -12,8 +13,8 @@ namespace BuildScope
         public Result OnStartup(UIControlledApplication application)
         {
             var paneId = new DockablePaneId(PaneGuid);
-            var chatPanel = new ChatPanel();
-            application.RegisterDockablePane(paneId, "BuildScope", chatPanel);
+            var mainPanel = new MainPanel();
+            application.RegisterDockablePane(paneId, "BuildScope", mainPanel);
 
             string tabName = "BuildScope";
             application.CreateRibbonTab(tabName);
