@@ -6,7 +6,7 @@ A dockable side panel for Autodesk Revit 2025 that answers National Construction
 
 ## How it works
 
-You create a project with your building's classification (e.g. Class 2, Victoria, Type A). When you ask *"What FRL do I need for the walls between units?"*, the system embeds your question, searches 363 NCC sections using pgvector similarity filtered by your building class, sends the top matches to Gemini with your project context, and returns a concise answer with inline section references.
+You create a project with your building's classification (e.g. Class 2, Victoria, Type A). When you ask *"What FRL do I need for the walls between units?"*, the system embeds your question, searches the NCC using pgvector similarity filtered by your building class, sends the top matches to Gemini with your project context, and returns a concise answer with inline section references.
 
 The whole conversation is preserved per-project, so follow-up questions have full context. Switch between projects and each keeps its own chat history.
 
