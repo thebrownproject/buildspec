@@ -13,10 +13,20 @@ from google.genai import types
 from supabase import create_client
 from tqdm import tqdm
 
-HEADER_RE = re.compile(
-    r"^.+\nNCC 2022 Volume Two - Building Code of Australia\nPage \d+\n",
-    re.MULTILINE,
-)
+VOLUME_HEADERS = {
+    1: re.compile(
+        r"^.+\nNCC 2022 Volume One - Building Code of Australia\nPage \d+\n",
+        re.MULTILINE,
+    ),
+    2: re.compile(
+        r"^.+\nNCC 2022 Volume Two - Building Code of Australia\nPage \d+\n",
+        re.MULTILINE,
+    ),
+}
+VOLUME_CLASSES = {
+    1: [2, 3, 4, 5, 6, 7, 8, 9],
+    2: [1, 10],
+}
 FOOTER_RE = re.compile(r"\(1 May 2023\)\s*$", re.MULTILINE)
 VERSION_ANNO_RE = re.compile(
     r"^\[(?:2019|New for 2022|New For 2022):.+\]\s*$", re.MULTILINE
@@ -44,8 +54,8 @@ def load_env():
         sys.exit(f"Missing env vars: {', '.join(missing)}")
 
 
-def clean_page_text(text: str) -> str:
-    text = HEADER_RE.sub("", text)
+def clean_page_text(text: str, header_re: re.Pattern) -> str:
+    text = header_re.sub("", text)
     text = FOOTER_RE.sub("", text)
     text = VERSION_ANNO_RE.sub("", text)
     return text.strip()
@@ -97,7 +107,10 @@ def extract_section_text(full_text: str, section_id: str, next_section_id: str |
     return full_text[start:].strip()
 
 
-def chunk_pdf(pdf_path: str) -> list[dict]:
+def chunk_pdf(pdf_path: str, volume: int = 2) -> list[dict]:
+    header_re = VOLUME_HEADERS[volume]
+    applicable_classes = VOLUME_CLASSES[volume]
+
     doc = fitz.open(pdf_path)
     toc = doc.get_toc()
     total_pages = len(doc)
@@ -107,7 +120,7 @@ def chunk_pdf(pdf_path: str) -> list[dict]:
 
     def get_page_text(pg_0idx: int) -> str:
         if pg_0idx not in page_cache:
-            page_cache[pg_0idx] = clean_page_text(doc[pg_0idx].get_text())
+            page_cache[pg_0idx] = clean_page_text(doc[pg_0idx].get_text(), header_re)
         return page_cache[pg_0idx]
 
     # Filter to L3 entries, skip state appendices
@@ -173,11 +186,11 @@ def chunk_pdf(pdf_path: str) -> list[dict]:
             chunk_title = title if len(sub_chunks) == 1 else f"{title} (part {i + 1})"
             chunks.append({
                 "content": sub,
-                "volume": 2,
+                "volume": volume,
                 "part": part,
                 "section": section_id,
                 "title": chunk_title,
-                "applicable_classes": [1, 10],
+                "applicable_classes": applicable_classes,
                 "state_specific": False,
             })
 
@@ -256,9 +269,17 @@ def generate_embeddings(texts: list[str], client) -> list[list[float]]:
                 all_embeddings.extend([e.values for e in response.embeddings])
                 break
             except Exception as e:
-                if "429" in str(e) or "RESOURCE_EXHAUSTED" in str(e):
+                err = str(e)
+                retryable = (
+                    "429" in err
+                    or "RESOURCE_EXHAUSTED" in err
+                    or "ConnectError" in type(e).__name__
+                    or "Connection reset" in err
+                    or "ConnectionError" in type(e).__name__
+                )
+                if retryable and attempt < 4:
                     wait = (attempt + 1) * 15
-                    tqdm.write(f"  Rate limited, waiting {wait}s...")
+                    tqdm.write(f"  {type(e).__name__}, waiting {wait}s...")
                     time.sleep(wait)
                 else:
                     raise
@@ -311,18 +332,36 @@ def main():
         action="store_true",
         help="Print chunks without calling APIs",
     )
+    parser.add_argument(
+        "--volume",
+        type=int,
+        choices=[1, 2],
+        default=2,
+        help="NCC volume number (default: 2)",
+    )
+    parser.add_argument(
+        "--skip",
+        type=int,
+        default=0,
+        help="Skip first N chunks (resume after partial ingestion)",
+    )
     args = parser.parse_args()
 
     if not os.path.exists(args.pdf_path):
         sys.exit(f"PDF not found: {args.pdf_path}")
 
-    print(f"Parsing PDF: {args.pdf_path}")
-    chunks = chunk_pdf(args.pdf_path)
+    print(f"Parsing PDF: {args.pdf_path} (Volume {args.volume})")
+    chunks = chunk_pdf(args.pdf_path, volume=args.volume)
     print(f"Extracted {len(chunks)} chunks")
 
     if args.dry_run:
         print_dry_run(chunks)
         return
+
+    if args.skip > 0:
+        print(f"Skipping first {args.skip} chunks (resuming from index {args.skip})")
+        chunks = chunks[args.skip:]
+        print(f"Remaining chunks to process: {len(chunks)}")
 
     load_env()
 
