@@ -38,6 +38,12 @@ Ship fast. POC first, iterate later.
 - Project context makes answers specific, not generic
 - Rare combo: Revit API + RAG + AI — most BIM managers can't build this
 
+## References
+
+`references/` contains cloned repos for porting code from. These are local-only (gitignored) and not part of BuildScope's repo.
+
+- `references/archie-copilot/` — Archie Copilot source. The base side panel pattern to extend for BuildScope.
+
 ## Related
 
 - Archie Copilot: github.com/thebrownproject/archie-copilot
