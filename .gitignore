@@ -1,0 +1,26 @@
+# Environment variables (contains secrets)
+.env
+.env.local
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Ingestion data
+ingestion/pdfs/
+
+# IDE
+.vs/
+.idea/
+*.user
+*.suo
+
+# Build output
+bin/
+obj/
+
+# OS
+.DS_Store
+Thumbs.db
