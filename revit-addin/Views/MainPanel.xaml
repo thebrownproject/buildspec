@@ -1,6 +1,6 @@
 <Page x:Class="BuildScope.Views.MainPanel"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      Background="#1B1B1F">
+      Background="#F5F1EB">
     <ContentControl x:Name="ViewHost" />
 </Page>
